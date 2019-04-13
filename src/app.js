@@ -13,6 +13,8 @@ app.use(morgan('dev'));
 // ========= GLOBAL VARIABLES =========
 
 // ========= ROUTES =========
+app.use('/api', require('./routes/app'));
+app.use('/api/links', require('./routes/links'));
 
 // ========= PUBLIC =========
 
