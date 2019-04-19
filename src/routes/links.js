@@ -6,7 +6,8 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    res.send('post link!');
+    res.json(req.body);
+    console.log(req.body);
 });
 
 module.exports = router;
