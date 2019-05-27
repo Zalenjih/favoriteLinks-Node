@@ -26,6 +26,7 @@ app.use((req, res, next) => {
 
 // ========= ROUTES =========
 app.use('/api', require('./routes/app'));
+app.use('/api/users', require('./routes/users'));
 app.use('/api/links', require('./routes/links'));
 
 // ========= PUBLIC =========
