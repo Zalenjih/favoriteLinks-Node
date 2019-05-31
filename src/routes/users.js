@@ -17,12 +17,12 @@ router.get('/', async (req, res) => {
         connection.commit();
 
     } catch (error) {
+        connection.rollback();
         console.log(error);
-        res.send({
+        return res.send({
             error: error,
             message: error.message
         });
-        connection.rollback();
     } finally {
         pool.releaseConnection(connection);
     }
