@@ -1,14 +1,31 @@
 const express = require('express');
 const morgan = require('morgan');
 
+/* const session = require('express-session'); // almacenan datos en la memoria del servidor
+const MySQLStore = require('express-mysql-session'); // almacenar datos del servidor en la base de datos */
+const passport = require('passport');
+
+/* const database = require('./database/database'); */
+
 // ========= INITIALIZATIONS =========
 const app = express();
+require('./config/passport');
 
 // ========= SETTINGS =========
 app.set('port', process.env.PORT || 3000);
 
 // ========= MIDDLEWARES =========
+/* app.use(session({
+    secret: 'favoriteLinksNode',
+    resave: 'false',
+    saveUninitialized: 'false',
+    store: new MySQLStore(database)
+})); */
+
 app.use(morgan('dev'));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
