@@ -37,8 +37,9 @@ router.post('/', async (req, res) => {
         msj: 'Usuario creado'
     };
     try {
-        connection.beginTransaction();
-        const rBody = {
+        await connection.beginTransaction();
+        const user = {username, email, password, fullname, role} = req.body;
+        /* const rBody = {
             username,
             password,
             fullname
@@ -47,16 +48,15 @@ router.post('/', async (req, res) => {
             username: rBody.username,
             password: rBody.password,
             fullname: rBody.fullname
-        };
-        await connection.query('INSERT INTO users SET ?', [newUser]);
-        connection.commit();
+        }; */
+        await connection.query('INSERT INTO users SET ?', [user]);
+        await connection.commit();
     } catch (error) {
-        connection.rollback();
+        await connection.rollback();
         console.log(error);
         msj.ok = false;
         msj.error = error;
         msj.msj = error.message;
-        return res.send(msj);
     } finally {
         pool.releaseConnection(connection);
         return res.send(msj);
