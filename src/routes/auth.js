@@ -6,7 +6,9 @@ const passEncrypt = require('../lib/passEncrypt');
 const jwt = require('jsonwebtoken');
 const {JWT} = require('../config/keys');
 
-router.post('/login', async (req, res) => {
+const auth = require('../lib/authentication');
+
+router.post('/login', auth.verificaToken, async (req, res) => {
     const connection = await pool.getConnection();
     try {
         const user = {username, password} = req.body;
