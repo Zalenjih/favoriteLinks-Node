@@ -6,7 +6,8 @@ const auth = {};
     auth.verificaToken = async (req, res, next) => {
         try {
             const token = req.get('token');
-            await jwt.verify(token, JWT.seed);
+            const decoded = await jwt.verify(token, JWT.seed);
+            req.usuario = decoded.usuario;
             next();
         } catch (error) {
             return res.status(401).json({
@@ -14,7 +15,7 @@ const auth = {};
                 error
             });
         }
-    }
+    };
 
 
 module.exports = auth; 

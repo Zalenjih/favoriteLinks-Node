@@ -3,26 +3,29 @@ const router = express.Router();
 
 const pool = require('../database/database');
 
-// TODO: revisar si es necesario usar await al iniciar y terminar trasacciones
+const jwt = require('jsonwebtoken');
+const auth = require('../lib/authentication');
 
 // ==============================================================
 // =================== OBTENER TODOS LOS LINKS ==================
 // ==============================================================
-router.get('/', async (req, res) => {
+router.get('/', auth.verificaToken, async (req, res) => {
     const connection = await pool.getConnection();
     try {
+        const usuario = req.usuario;
         await connection.beginTransaction();
-
-        const links = await connection.query('SELECT * FROM links');
-        res.send({links});
+        const links = await connection.query('SELECT * FROM links WHERE userId', [usuario.id]);
         await connection.commit();
-
+        res.status(200).json({
+            ok: true,
+            links
+        });
     } catch (error) {
         await connection.rollback();
         console.log(error);
         return res.send({
-            error: error,
-            message: error.message
+            ok: false,
+            error
         });
     } finally {
         pool.releaseConnection(connection);
@@ -56,13 +59,8 @@ router.get('/:id', async (req, res) => {
 // ==============================================================
 // ===================== CREANDO UN LINK ========================
 // ==============================================================
-router.post('/', async (req, res) => {
+router.post('/', auth.verificaToken, async (req, res) => {
     const connection = await pool.getConnection();
-    let msj = {
-        ok: 'true',
-        error: '',
-        msj: 'Link creado'
-    };
     try {
         await connection.beginTransaction();
         const rBody = {
@@ -72,23 +70,25 @@ router.post('/', async (req, res) => {
             description
         } = req.body;
         const newLink = {
-            userId: rBody.userId,
+            userId: req.usuario.id,
             title: rBody.title,
             url: rBody.url,
             description: rBody.description
         };
         await connection.query('INSERT INTO links SET ?', [newLink]);
         await connection.commit();
+        return res.status(201).json({
+            ok: true,
+            message: 'Link creado correctamente'
+        });
     } catch (error) {
         await connection.rollback();
-        console.log(error);
-        msj.ok = false;
-        msj.error = error;
-        msj.msj = error.message;
-        return res.send(msj);
+        return res.status(400).json({
+            ok: false,
+            error
+        });
     } finally {
         pool.releaseConnection(connection);
-        return res.send(msj);
     }
 });
 

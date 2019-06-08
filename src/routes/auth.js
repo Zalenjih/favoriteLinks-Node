@@ -17,12 +17,12 @@ router.post('/login', async (req, res) => {
             const userDb = result[0];
             const validPassword = await passEncrypt.matchPassword(user.password, userDb.password);
             if (validPassword) {
+                userDb.password = 'z';
                 let token = jwt.sign({
-                    ususario: userDb
+                    usuario: userDb
                 }, JWT.seed, {
                     expiresIn: JWT.expiration
                 });
-                userDb.password = 'z';
                 return res.status(200).json({
                     ok: true,
                     user: userDb,
