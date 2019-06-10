@@ -1,33 +1,31 @@
 const express = require('express');
 const router = express.Router();
-
 const pool = require('../database/database');
-
 const jwt = require('jsonwebtoken');
 const auth = require('../lib/authentication');
 
 // ==============================================================
-// =================== OBTENER TODOS LOS LINKS ==================
+// ================== OBTENER TODOS LOS LINKS ===================
 // ==============================================================
-router.get('/', auth.verificaToken, async (req, res) => {
+router.get('/', async (req, res) => {
     const connection = await pool.getConnection();
     try {
-        const usuario = req.usuario;
         await connection.beginTransaction();
-        const links = await connection.query('SELECT * FROM links WHERE userId', [usuario.id]);
+        const links = await connection.query('SELECT * FROM links');
         await connection.commit();
         res.status(200).json({
             ok: true,
             links
-        });
+        })
     } catch (error) {
         await connection.rollback();
         console.log(error);
-        return res.send({
+        return res.status(400).json({
             ok: false,
             error
         });
-    } finally {
+    }
+    finally {
         pool.releaseConnection(connection);
     }
 });
@@ -50,6 +48,33 @@ router.get('/:id', async (req, res) => {
             message: error.message
         });
         await connection.rollback();
+    } finally {
+        pool.releaseConnection(connection);
+    }
+});
+
+
+// ==============================================================
+// ============ OBTENER TODOS LOS LINKS DE UN USUARIO ===========
+// ==============================================================
+router.get('/user', auth.verificaToken, async (req, res) => {
+    const connection = await pool.getConnection();
+    try {
+        const usuario = req.usuario;
+        await connection.beginTransaction();
+        const links = await connection.query('SELECT * FROM links WHERE userId', [usuario.id]);
+        await connection.commit();
+        res.status(200).json({
+            ok: true,
+            links
+        });
+    } catch (error) {
+        await connection.rollback();
+        console.log(error);
+        return res.status(400).json({
+            ok: false,
+            error
+        });
     } finally {
         pool.releaseConnection(connection);
     }
