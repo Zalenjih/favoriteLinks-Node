@@ -1,6 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 
+/* const database = require('./database/database'); */
+
 // ========= INITIALIZATIONS =========
 const app = express();
 
@@ -9,7 +11,6 @@ app.set('port', process.env.PORT || 3000);
 
 // ========= MIDDLEWARES =========
 app.use(morgan('dev'));
-
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
@@ -26,6 +27,8 @@ app.use((req, res, next) => {
 
 // ========= ROUTES =========
 app.use('/api', require('./routes/app'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/users', require('./routes/users'));
 app.use('/api/links', require('./routes/links'));
 
 // ========= PUBLIC =========
