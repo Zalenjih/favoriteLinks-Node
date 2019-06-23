@@ -12,10 +12,28 @@ const auth = {};
         } catch (error) {
             return res.status(401).json({
                 ok: false,
-                error
+                error: error
             });
         }
     };
+
+    auth.verificaAdmin = async (req, res, next) => {
+        try {
+            const role = req.usuario.role;
+            if (role === 'ADMIN_ROLE') {
+                next();
+            }
+            return res.status(401).json({
+                ok: false,
+                message: 'No tiene permisos suficientes',
+            });
+        } catch (error) {
+            return res.send(500).json({
+                ok: false,
+                error: error
+            });
+        }
+    }
 
 
 module.exports = auth; 

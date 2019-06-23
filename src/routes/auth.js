@@ -13,6 +13,7 @@ router.post('/login', async (req, res) => {
         await connection.beginTransaction();
         const result = await connection.query('SELECT * FROM users WHERE username = ?', [user.username]);
         await connection.commit();
+        console.log(result);
         if (result.length > 0){
             const userDb = result[0];
             const validPassword = await passEncrypt.matchPassword(user.password, userDb.password);
@@ -27,6 +28,13 @@ router.post('/login', async (req, res) => {
                     ok: true,
                     user: userDb,
                     token
+                });
+            } else {
+                return res.status(400).json({
+                    ok: false,
+                    err: {
+                        message: 'Credenciales incorrectas'
+                    }
                 });
             }
         } else {
